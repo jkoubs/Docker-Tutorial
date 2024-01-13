@@ -6,8 +6,11 @@
    - [Change the ROS base image](#change-the-ros-base-image)
    - [Adding a regular user](#adding-a-regular-user)
    - [Running with different users](#running-with-different-users)
+   - [Setting up sudo to create files as root](#setting-up-sudo-to-create-files-as-root)
+   - [Tricks when using apt-get](#tricks-when-using-apt-get)
   
  
+
 # Main Commands
 
 #### Build an image:
@@ -296,9 +299,9 @@ USER root
 
 But it is good practice to end the Dockerfile with teh user root and then just use the **docker run --user** command to select which user you want when you start the container.
 
-## Setting up sudo to create files as root (if other user are added)
+## Setting up sudo to create files as root
 
-This is not really necessary since you can use **docker exec** to create a new terminal in the container with **root** access. But it make things easier.
+Particularly useful when other user is added, but you can use **docker exec** to create a new terminal in the container with **root** access. But the following will make things easier.
 
 **STEP 1:** Add to Dockerfile: 
 
