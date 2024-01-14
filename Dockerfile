@@ -22,3 +22,13 @@ RUN apt-get update \
    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME\
    && chmod 0440 /etc/sudoers.d/$USERNAME \
    && rm -rf /var/lib/apt/lists/*
+
+
+# Create an Entrypoint
+
+COPY entrypoint.sh /entrypoint.sh
+COPY bashrc /home/${USERNAME}/.bashrc
+
+ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
+
+CMD ["bash"]
