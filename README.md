@@ -6,6 +6,7 @@
  - [Making an Entrypoint Script](#making-an-entrypoint-script)
  - [GUI Programs](#gui-programs)
  - [Argument Completion](#argument-completion)
+ - [Store Docker data folder into SSD](#store-docker-data-folder-into-ssd)
  - [Solving common-issues related to Robotics](#solving-common-issues-related-to-robotics)
    - [Change the ROS base image](#change-the-ros-base-image)
    - [Adding a regular user](#adding-a-regular-user)
