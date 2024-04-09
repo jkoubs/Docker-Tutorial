@@ -297,7 +297,7 @@ It will start the container, then execute the command and finally quit.
 # GUI Programs 
 
 
-First, we ned to be running our container as a user that has permission to access **X**.
+First, we need to be running our container as a user that has permission to access **X**.
 If you are running the containers as a user that matches the host,it will already have graphics access. If not, we need to add it:
 
 
@@ -371,6 +371,40 @@ Now you should have the argument completion added to your container.
 
 
 **IMPORTANT:** Similar to the entrypoint, you can also put other things in the **bashrc** that will get executed on the start of each terminal.
+
+# Store Docker data folder into SSD
+
+It's possible to store Docker images/containers on an SSD (Solid State Drive). In fact, storing Docker images/containers on an SSD can provide better performance compared to traditional hard disk drives (HDDs) due to the faster read and write speeds of SSDs.
+
+**Note**: Docker iamges and conatiners data are stored in  the Docker data director. To check where it is located you can execute:
+
+```bash
+docker info | grep "Docker Root Dir"
+```
+To store Docker images/containers on an SSD, you can configure Docker to use a different storage location. Here's how you can do it:
+
+* **Stop Docker Service**: First, stop the Docker service to prevent any potential conflicts while changing the storage location.
+
+```bash
+sudo systemctl stop docker
+```
+* **Move Docker Data Directory**: Move the Docker data directory to the desired location on your SSD. Let's say you want to move it to **/mnt/ssd/docke**r:
+
+```bash
+sudo mv /var/lib/docker /mnt/ssd/docker
+```
+* **Create Symbolic Link**: Create a symbolic link from the original location to the new location on the SSD.
+
+```bash
+sudo ln -s /mnt/ssd/docker /var/lib/docker
+```
+* **Start Docker Service**: Finally, start the Docker service to apply the changes.
+
+```bash
+sudo systemctl start docker
+```
+
+By following these steps, you'll configure Docker to store images and containers in the directory located on your SSD (**/mnt/ssd/docker** in this example). This can help improve Docker's performance and reduce load times for running containers.
 
 
 # Solving common-issues related to Robotics
