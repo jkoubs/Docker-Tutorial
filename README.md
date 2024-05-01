@@ -435,7 +435,7 @@ To store Docker images/containers on an SSD, you can configure Docker to use a d
    For our case it was:
 
    ```bash
-   UUID=319da097-a576-4379-a9b1-b40e10fda693 /media/jason/DockerSSD ext4 defaults,uid=1000,gid=1000 0 2
+   UUID=319da097-a576-4379-a9b1-b40e10fda693 /media/jason/DockerSSD ext4 defaults 0 2
    ```
 
 * **Save and Close the File:**
