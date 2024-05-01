@@ -377,12 +377,150 @@ Now you should have the argument completion added to your container.
 
 It's possible to store Docker images/containers on an SSD (Solid State Drive). In fact, storing Docker images/containers on an SSD can provide better performance compared to traditional hard disk drives (HDDs) due to the faster read and write speeds of SSDs.
 
-**Note**: Docker iamges and conatiners data are stored in  the Docker data director. To check where it is located you can execute:
+**Note**: Docker images and containers data are stored in the Docker data director. To check where it is located you can execute:
 
 ```bash
 docker info | grep "Docker Root Dir"
 ```
+
+**Note:** By default the location of the Docker Root Directory is: `/var/lib/docker`.
+
+
 To store Docker images/containers on an SSD, you can configure Docker to use a different storage location. Here's how you can do it:
+
+### Method 1
+
+**1. Edit /etc/fstab File**
+
+
+* **Find the UUID of Your SSD Partition:**
+
+   First, you need to find the UUID of the SSD partition you're using for Docker. You can find this by using the blkid command:
+
+   ```bash
+   sudo blkid
+   ```
+
+   Look for the line corresponding to `/dev/sdb1` (or whatever your SSD partition is). You'll see something like:
+
+   ```bash
+   /dev/sdb1: UUID="some-long-uuid" TYPE="ext4" PARTUUID="some-partuuid"
+   ```
+
+* **Edit the /etc/fstab File:**
+
+   Open the `/etc/fstab` file with a text editor using sudo privileges. I'll use nano here, but any text editor will work:
+
+   ```bash
+   sudo nano /etc/fstab
+   ```
+
+* **Add Your SSD Mount Entry:**
+
+   At the end of the file, add a line for your SSD. It should look something like this:
+
+   ```bash
+   UUID=some-long-uuid /media/jason/DockerSSD ext4 defaults 0 2
+   ```
+   Replace some-long-uuid with the UUID you got from the blkid command.
+
+   `ext4` is the filesystem type, which should match what you identified earlier.
+
+   `defaults` are the mount options. These are usually sufficient for most uses.
+
+   The first `0` at the end of the line refers to dump (backup utility), and it's typically set to 0 to disable it.
+
+   The second `2` refers to the pass during startup checks; for root filesystem, it’s usually `1`, and for others, it’s `2` or higher.
+
+   For our case it was:
+
+   ```bash
+   UUID=319da097-a576-4379-a9b1-b40e10fda693 /media/jason/DockerSSD ext4 defaults,uid=1000,gid=1000 0 2
+   ```
+
+* **Save and Close the File:**
+
+* **Test the Configuration:**
+
+   To make sure there are no errors in your `/etc/fstab` file and that everything mounts correctly, you can simulate a mount event with:
+
+   ```bash
+   sudo mount -a
+   ```
+   This command will attempt to mount all filesystems mentioned in /etc/fstab. If there are no errors, everything is set up correctly.
+
+
+
+**2. Stop Docker**
+Before making changes to the Docker storage configuration, it's important to stop Docker to prevent any potential data loss. You can do this by running:
+
+```bash
+sudo systemctl stop docker
+```
+
+**3. Move Existing Docker Data (Optional)**
+
+If you have Docker already installed and have data that you want to retain, you need to move this data to the new location on your SSD:
+
+```bash
+sudo rsync -av /var/lib/docker/ /media/jason/DockerSSD/
+```
+Ensure the permissions remain correct after copying:
+
+```bash
+sudo chown -R root:root /media/jason/DockerSSD
+```
+
+**4. Update Docker Configuration**
+
+Edit or create the Docker daemon configuration file to specify the new data storage location:
+
+```bash
+sudo nano /etc/docker/daemon.json
+```
+
+In the `daemon.json file`, add or update the data-root setting to your new path:
+
+```bash
+{
+  "data-root": "/media/jason/DockerSSD"
+}
+```
+
+Save and exit the editor.
+
+
+
+**5. Restart Docker**
+After updating the configuration, restart Docker to apply the changes:
+
+```bash
+sudo systemctl start docker
+```
+
+**6. Verify the Configuration**
+
+Check that Docker is now using the new path for its data storage:
+
+```bash
+docker info | grep "Docker Root Dir"
+```
+
+This command should output the path you configured `/media/jason/DockerSSD`. This confirms that Docker is now using your SSD for storing images and containers.
+
+
+**7. Clean Up (Optional)**
+If everything is working fine and you've confirmed that Docker is using the new location, you might want to remove the old Docker data from the previous location to free up space. Before doing this, ensure that all your data is correctly accessible from the new location:
+
+```bash
+sudo rm -rf /var/lib/docker/
+```
+
+Be very careful with this step to avoid deleting data unintentionally.
+
+By following these steps, Docker will now utilize your SSD for all container and image storage, which should result in faster performance due to the increased speed of SSDs compared to traditional hard drives.
+
+### Method 2
 
 * **Stop Docker Service**: First, stop the Docker service to prevent any potential conflicts while changing the storage location.
 
